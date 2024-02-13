@@ -119,6 +119,8 @@ objects:
             initialDelaySeconds: ${{READINESS_PERIOD}}
             periodSeconds: ${{READINESS_PERIOD}}
           env:
+          - name: BRANCH
+            value: ${BRANCH}
           - name: RCLONE_ACCESS_KEY_ID
             value: ${RCLONE_ACCESS_KEY_ID}
           - name: RCLONE_SECRET_ACCESS_KEY
