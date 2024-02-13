@@ -25,6 +25,10 @@ parameters:
     required: true
   - name: HOST
     required: true
+  - name: RCLONE_ACCESS_KEY_ID
+    required: true
+  - name: RCLONE_SECRET_ACCESS_KEY
+    required: true
   - name: GITHUB_SECRET
     required: true
     generate: expression
@@ -115,8 +119,10 @@ objects:
             initialDelaySeconds: ${{READINESS_PERIOD}}
             periodSeconds: ${{READINESS_PERIOD}}
           env:
-          - name: 
-            value:
+          - name: RCLONE_ACCESS_KEY_ID
+            value: ${RCLONE_ACCESS_KEY_ID}
+          - name: RCLONE_SECRET_ACCESS_KEY
+            value: ${RCLONE_SECRET_ACCESS_KEY}
         volumes:
         - name: ${APP}-${BRANCH}
           persistentVolumeClaim:
