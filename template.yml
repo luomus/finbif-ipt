@@ -121,9 +121,9 @@ objects:
           env:
           - name: BRANCH
             value: ${BRANCH}
-          - name: RCLONE_ACCESS_KEY_ID
+          - name: RCLONE_CONFIG_DEFAULT_ACCESS_KEY_ID
             value: ${RCLONE_ACCESS_KEY_ID}
-          - name: RCLONE_SECRET_ACCESS_KEY
+          - name: RCLONE_CONFIG_DEFAULT_SECRET_ACCESS_KEY
             value: ${RCLONE_SECRET_ACCESS_KEY}
         volumes:
         - name: ${APP}-${BRANCH}

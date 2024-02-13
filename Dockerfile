@@ -12,6 +12,7 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY permissions.sh /usr/local/bin/permissions.sh
 COPY backup.sh /usr/local/bin/backup.sh
 COPY backup-crontab /home/user/backup-crontab
+COPY rclone.conf /home/user/.config/rclone/rclone.conf
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -23,6 +24,8 @@ RUN apt-get update \
 
 RUN mkdir -p /srv/ipt \
  && permissions.sh
+
+WORKDIR /home/user
 
 ENTRYPOINT ["entrypoint.sh"]
 
