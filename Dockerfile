@@ -18,6 +18,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       cron \
       rclone \
+      rsync \
  && apt-get autoremove --purge -y \
  && apt-get autoclean -y \
  && rm -rf /var/lib/apt/lists/*
