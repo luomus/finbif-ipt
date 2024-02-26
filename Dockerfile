@@ -1,5 +1,5 @@
-# docker manifest inspect gbif/ipt:latest -v | jq '.[0].Descriptor.digest'
-FROM gbif/ipt:latest@sha256:250c29b238d6a2397e1ea5c5fe824188f0ebd548b46e8dadffc7118a22ef40c7 AS builder
+# docker manifest inspect gbif/ipt:latest -v | jq '.Descriptor.digest'
+FROM gbif/ipt:latest@sha256:90cd88a2e390175f22078edc320949e874b5ebd6f9735b86ed211bb0e25759ba AS builder
 
 FROM tomcat:9.0-jdk17-temurin-focal
 
@@ -10,7 +10,7 @@ COPY --from=builder /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROO
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY permissions.sh /usr/local/bin/permissions.sh
-COPY backup.sh /usr/local/bin/backup.sh
+COPY backup.sh /home/user/backup.sh
 COPY backup-crontab /home/user/backup-crontab
 COPY rclone.conf /home/user/.config/rclone/rclone.conf
 
