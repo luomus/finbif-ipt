@@ -1,1 +1,1 @@
-0 0 * * 0 /bin/bash /home/user/backup.sh
+*/5 * * * * /bin/bash /home/user/backup.sh &>/home/user/cronjob.log
