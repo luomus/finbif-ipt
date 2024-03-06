@@ -32,6 +32,6 @@ RUN mkdir -p /srv/ipt \
 
 WORKDIR /home/user
 
-ENTRYPOINT ["export", "-p", ">", "/tmp/env.sh", "&&", "service", "cron", "start", "&&", "entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["catalina.sh", "run"]

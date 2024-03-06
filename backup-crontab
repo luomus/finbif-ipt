@@ -1,1 +1,1 @@
-*/5 * * * * /bin/bash -c '/usr/local/bin/backup.sh' >> /tmp/cron.log 2>&1
+*/5 * * * * /bin/bash -c '. /tmp/env.sh && /usr/local/bin/backup.sh' >> /tmp/cron.log 2>&1

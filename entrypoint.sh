@@ -1,5 +1,9 @@
 #!/bin/bash
 
+export -p >  /tmp/env.sh
+
+service cron start
+
 if [ "${BRANCH}" == "main" ]; then
 
 echo "<script defer data-domain=\"$HOST\" src=\"https://plausible.io/js/script.js\"></script>" >> $CATALINA_HOME/webapps/ROOT/WEB-INF/pages/inc/header.ftl
