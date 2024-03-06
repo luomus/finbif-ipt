@@ -9,7 +9,7 @@ function() {
 #* @serializer contentType list(type="application/zip")
 function() {
 
-  file <- tempfile()
+  file <- tempfile(tmpdir = "/home/user", fileext = ".zip")
 
   utils::zip(file, "/srv/ipt")
 
