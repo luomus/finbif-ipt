@@ -11,21 +11,17 @@ COPY --from=builder /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROO
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY permissions.sh /usr/local/bin/permissions.sh
 COPY backup.sh /usr/local/bin/backup.sh
-COPY backup-crontab /tmp/backup-crontab
+COPY backup.r /home/user/backup.r
 COPY rclone.conf /home/user/.config/rclone/rclone.conf
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      cron \
       rclone \
+      r-cran-plumber \
       rsync \
  && apt-get autoremove --purge -y \
  && apt-get autoclean -y \
  && rm -rf /var/lib/apt/lists/*
-
-RUN chmod +x /usr/local/bin/backup.sh && touch /tmp/cron.log
-
-RUN crontab -u root /tmp/backup-crontab
 
 RUN mkdir -p /srv/ipt \
  && permissions.sh

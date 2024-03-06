@@ -12,6 +12,38 @@ parameters:
   - name: APP_PORT
     required: true
     value: "8080"
+  - name: API
+    required: true
+    value: plumber
+  - name: API_PORT
+    required: true
+    value: "8000"
+  - name: API_CMD
+    required: true
+    value: '[
+      "sh",
+      "-c",
+      "R -e plumber::plumb(\"backup.R\")[[\"run\"]](\n\
+        host = \"0.0.0.0\", port = 8000L, quiet = TRUE\n\
+      )"
+    ]'
+  - name: CRON
+    required: true
+    value: job
+  - name: CRON_SCHEDULE
+    required: true
+    value: "0 0 * * 0"
+  - name: CRON_CMD
+    required: true
+    value: '[
+      "backup.sh"
+    ]'
+  - name: CRON_LIMIT
+    required: true
+    value: "7"
+  - name: CRON_CONCURRENCY
+    required: true
+    value: "Forbid"
   - name: LIVENESS_PERIOD
     required: true
     value: "30"
@@ -123,10 +155,26 @@ objects:
             value: ${BRANCH}
           - name: HOST
             value: ${HOST}
-          - name: RCLONE_CONFIG_DEFAULT_ACCESS_KEY_ID
-            value: ${RCLONE_ACCESS_KEY_ID}
-          - name: RCLONE_CONFIG_DEFAULT_SECRET_ACCESS_KEY
-            value: ${RCLONE_SECRET_ACCESS_KEY}
+        - image: ${APP}-${BRANCH}:latest
+          name: ${API}-${BRANCH}
+          command: ${{API_CMD}}
+          ports:
+          - containerPort: ${{API_PORT}}
+          volumeMounts:
+          - mountPath: ${DATA_DIR}
+            name: ${APP}-${BRANCH}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: ${{API_PORT}}
+            failureThreshold: ${{FAILURE_THRESHOLD}}
+            periodSeconds: ${{LIVENESS_PERIOD}}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: ${{API_PORT}}
+            initialDelaySeconds: ${{READINESS_PERIOD}}
+            periodSeconds: ${{READINESS_PERIOD}}
         volumes:
         - name: ${APP}-${BRANCH}
           persistentVolumeClaim:
@@ -155,6 +203,20 @@ objects:
     selector:
       app: ${APP}
       deploymentconfig: ${APP}-${BRANCH}
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${API}-${BRANCH}
+    labels:
+      app: ${APP}
+  spec:
+    ports:
+    - name: ${API_PORT}
+      port: ${{API_PORT}}
+      targetPort: ${{API_PORT}}
+    selector:
+      app: ${APP}
+      deploymentconfig: ${APP}-${BRANCH}
 - kind: Route
   apiVersion: v1
   metadata:
@@ -171,3 +233,33 @@ objects:
       kind: Service
       name: ${APP}-${BRANCH}
     wildcardPolicy: None
+- kind: CronJob
+  apiVersion: batch/v1beta1
+  metadata:
+    name: ${APP}-${BRANCH}
+  spec:
+    schedule: ${CRON_SCHEDULE}
+    concurrencyPolicy: ${CRON_CONCURRENCY}
+    successfulJobsHistoryLimit: ${{CRON_LIMIT}}
+    failedJobsHistoryLimit: ${{CRON_LIMIT}}
+    jobTemplate:
+      spec:
+        template:
+          metadata:
+            labels:
+              app: ${APP}
+          spec:
+            containers:
+            - name: ${APP}-${BRANCH}-${CRON}
+              image: ${APP}-${BRANCH}:latest
+              command: ${{CRON_CMD}}
+              env:
+              - name: RCLONE_CONFIG_DEFAULT_ACCESS_KEY_ID
+                value: ${RCLONE_ACCESS_KEY_ID}
+              - name: RCLONE_CONFIG_DEFAULT_SECRET_ACCESS_KEY
+                value: ${RCLONE_SECRET_ACCESS_KEY}
+              - name: API_HOSTNAME
+                value: ${API}-${BRANCH}.${APP}.svc
+              - name: API_PORT
+                value: ${API_PORT}
+            restartPolicy: Never

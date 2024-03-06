@@ -1,15 +1,13 @@
 #!/bin/bash
 
-TIMESTAMP=$(date '+%Y%m%d%H%M%S') 
+TIMESTAMP=$(date '+%Y%m%d%H%M%S')
 
-echo "Archiving data [$TIMESTAMP]\n"
-
-tar -czf /tmp/backup-$TIMESTAMP-$BRANCH.tar.gz -C / srv/ipt/
+curl -o backup-$TIMESTAMP-$BRANCH.zip $API_HOSTNAME:$API_PORT/backup
 
 echo "Copying data to object store [$TIMESTAMP]\n"
 
-rclone copy "/tmp/backup-$TIMESTAMP-$BRANCH.tar.gz" "default:hy-7088-finbif-ipt"
+rclone copy "/home/user/backup-$TIMESTAMP-$BRANCH.zip" "default:hy-7088-finbif-ipt"
 
 echo "Removing local archive [$TIMESTAMP]\n"
 
-rm /tmp/backup-$TIMESTAMP-$BRANCH.tar.gz
+rm /home/user/backup-$TIMESTAMP-$BRANCH.zip
