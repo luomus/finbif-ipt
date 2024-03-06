@@ -23,7 +23,7 @@ parameters:
     value: '[
       "sh",
       "-c",
-      "Rscript --vanilla init.R"
+      "Rscript --vanilla init.r"
     ]'
   - name: CRON
     required: true
@@ -153,11 +153,19 @@ objects:
             value: ${BRANCH}
           - name: HOST
             value: ${HOST}
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
         - image: ${APP}-${BRANCH}:latest
           name: ${API}-${BRANCH}
           command: ${{API_CMD}}
           ports:
           - containerPort: ${{API_PORT}}
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
           volumeMounts:
           - mountPath: ${DATA_DIR}
             name: ${APP}-${BRANCH}
@@ -184,6 +192,7 @@ objects:
         automatic: true
         containerNames:
         - ${APP}-${BRANCH}
+        - ${API}-${BRANCH}
         from:
           kind: ImageStreamTag
           name: ${APP}-${BRANCH}:latest
@@ -257,7 +266,9 @@ objects:
               - name: RCLONE_CONFIG_DEFAULT_SECRET_ACCESS_KEY
                 value: ${RCLONE_SECRET_ACCESS_KEY}
               - name: API_HOSTNAME
-                value: ${API}-${BRANCH}.${APP}.svc
+                value: ${API}-${BRANCH}.ipt.svc
               - name: API_PORT
                 value: ${API_PORT}
+              - name: BRANCH
+                value: ${BRANCH}
             restartPolicy: Never
