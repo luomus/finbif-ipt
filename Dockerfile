@@ -5,6 +5,7 @@ FROM tomcat:9.0-jdk17-temurin-focal
 
 ENV IPT_DATA_DIR=/srv/ipt
 ENV HOME=/home/user
+ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT
 
@@ -12,6 +13,7 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY permissions.sh /usr/local/bin/permissions.sh
 COPY backup.sh /usr/local/bin/backup.sh
 COPY backup.r /home/user/backup.r
+COPY init.r /home/user/init.r
 COPY rclone.conf /home/user/.config/rclone/rclone.conf
 
 RUN apt-get update \
