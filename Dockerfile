@@ -1,13 +1,9 @@
 # docker manifest inspect gbif/ipt:latest -v | jq '.Descriptor.digest'
-FROM gbif/ipt:latest@sha256:cac31d56afd36328da2e9b171fb81959041b1ecefb14ef88c9c6349cfddc2570 AS builder
-
-FROM tomcat:9.0-jdk17-temurin-focal
+FROM gbif/ipt:latest@sha256:237fb8e8f016866c0bc66cede7b84959df549844ef4275c0e0a86e1a8dd5f528
 
 ENV IPT_DATA_DIR=/srv/ipt
 ENV HOME=/home/user
 ENV DEBIAN_FRONTEND=noninteractive
-
-COPY --from=builder /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/ROOT
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY permissions.sh /usr/local/bin/permissions.sh
