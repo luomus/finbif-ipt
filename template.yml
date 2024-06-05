@@ -9,6 +9,12 @@ parameters:
   - name: DATA_DIR
     required: true
     value: /srv/ipt
+  - name: STORAGE_CLASS
+    required: true
+    value: standard-csi
+  - name: ACCESS_MODE
+    required: true
+    value: ReadWriteOnce
   - name: APP_PORT
     required: true
     value: "8080"
@@ -71,9 +77,9 @@ objects:
   metadata:
     name: ${APP}-${BRANCH}
   spec:
+    storageClassName: ${STORAGE_CLASS}
     accessModes:
-    - ReadWriteOnce
-    persistentVolumeReclaimPolicy: Retain
+    - ${ACCESS_MODE}
     resources:
       requests:
         storage: ${STORAGE}
@@ -109,8 +115,8 @@ objects:
     - type: GitHub
       github:
         secret: ${GITHUB_SECRET}
-- kind: DeploymentConfig
-  apiVersion: v1
+- kind: Deployment
+  apiVersion: apps/v1
   metadata:
     name: ${APP}-${BRANCH}
     labels:
@@ -118,15 +124,15 @@ objects:
   spec:
     replicas: 1
     selector:
-      app: ${APP}
-      deploymentconfig: ${APP}-${BRANCH}
+      matchLabels:
+        app: ${APP}
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
           app: ${APP}
-          deploymentconfig: ${APP}-${BRANCH}
+          branch: ${BRANCH}
       spec:
         containers:
         - image: ${APP}-${BRANCH}:latest
@@ -136,6 +142,12 @@ objects:
           volumeMounts:
           - mountPath: ${DATA_DIR}
             name: ${APP}-${BRANCH}
+          startupProbe:
+            httpGet:
+              path: /about.do
+              port: ${{APP_PORT}}
+            failureThreshold: ${{FAILURE_THRESHOLD}}
+            periodSeconds: ${{LIVENESS_PERIOD}}
           livenessProbe:
             httpGet:
               path: /about.do
@@ -146,7 +158,6 @@ objects:
             httpGet:
               path: /
               port: ${{APP_PORT}}
-            initialDelaySeconds: ${{READINESS_PERIOD}}
             periodSeconds: ${{READINESS_PERIOD}}
           env:
           - name: BRANCH
@@ -155,7 +166,7 @@ objects:
             value: ${HOST}
           resources:
             limits:
-              memory: "4Gi"
+              memory: "6Gi"
               cpu: "1000m"
         - image: ${APP}-${BRANCH}:latest
           name: ${API}-${BRANCH}
@@ -164,11 +175,17 @@ objects:
           - containerPort: ${{API_PORT}}
           resources:
             limits:
-              memory: "4Gi"
-              cpu: "1000m"
+              memory: "1Gi"
+              cpu: "500m"
           volumeMounts:
           - mountPath: ${DATA_DIR}
             name: ${APP}-${BRANCH}
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: ${{APP_PORT}}
+            failureThreshold: ${{FAILURE_THRESHOLD}}
+            periodSeconds: ${{LIVENESS_PERIOD}}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -179,7 +196,6 @@ objects:
             httpGet:
               path: /healthz
               port: ${{API_PORT}}
-            initialDelaySeconds: ${{READINESS_PERIOD}}
             periodSeconds: ${{READINESS_PERIOD}}
         volumes:
         - name: ${APP}-${BRANCH}
@@ -209,7 +225,7 @@ objects:
       targetPort: ${{APP_PORT}}
     selector:
       app: ${APP}
-      deploymentconfig: ${APP}-${BRANCH}
+      branch: ${BRANCH}
 - kind: Service
   apiVersion: v1
   metadata:
@@ -223,7 +239,7 @@ objects:
       targetPort: ${{API_PORT}}
     selector:
       app: ${APP}
-      deploymentconfig: ${APP}-${BRANCH}
+      branch: ${BRANCH}
 - kind: Route
   apiVersion: v1
   metadata:
@@ -235,11 +251,10 @@ objects:
     port:
       targetPort: ${{APP_PORT}}
     tls:
-      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
     to:
       kind: Service
       name: ${APP}-${BRANCH}
-    wildcardPolicy: None
 - kind: CronJob
   apiVersion: batch/v1beta1
   metadata:
@@ -266,7 +281,7 @@ objects:
               - name: RCLONE_CONFIG_DEFAULT_SECRET_ACCESS_KEY
                 value: ${RCLONE_SECRET_ACCESS_KEY}
               - name: API_HOSTNAME
-                value: ${API}-${BRANCH}.ipt.svc
+                value: ${API}-${BRANCH}
               - name: API_PORT
                 value: ${API_PORT}
               - name: BRANCH
