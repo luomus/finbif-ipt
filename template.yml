@@ -79,6 +79,14 @@ objects:
     resources:
       requests:
         storage: ${STORAGE}
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: ${APP}-${BRANCH}
+  type: Opaque
+  data:
+    rclone_access_key_id: ${RCLONE_ACCESS_KEY_ID}
+    rclone_secret_access_key: ${RCLONE_SECRET_ACCESS_KEY}
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
@@ -222,10 +230,16 @@ objects:
               command: ${{CRON_CMD}}
               env:
               - name: RCLONE_CONFIG_DEFAULT_ACCESS_KEY_ID
-                value: ${RCLONE_ACCESS_KEY_ID}
+                valueFrom:
+                  secretKeyRef:
+                    name: ${APP}-${BRANCH}
+                    key: rclone_access_key_id
               - name: RCLONE_CONFIG_DEFAULT_SECRET_ACCESS_KEY
-                value: ${RCLONE_SECRET_ACCESS_KEY}
-              - name: API_HOSTNAME
+                valueFrom:
+                  secretKeyRef:
+                    name: ${APP}-${BRANCH}
+                    key: rclone_secret_access_key
+                  - name: API_HOSTNAME
                 value: ${API}-${BRANCH}
               - name: API_PORT
                 value: ${API_PORT}

@@ -29,31 +29,38 @@ if [ $i = "volume" ]; then
 
 ITEM=".items[0]"
 
-elif [ $i = "deploy" ]; then
+elif [ $i = "secrets" ]; then
 
 ITEM=".items[1]"
 
-elif [ $i = "service-app" ]; then
+elif [ $i = "deploy" ]; then
 
 ITEM=".items[2]"
 
-elif [ $i = "service-api" ]; then
+elif [ $i = "service-app" ]; then
 
 ITEM=".items[3]"
 
-elif [ $i = "route" ]; then
+elif [ $i = "service-api" ]; then
 
 ITEM=".items[4]"
 
-elif [ $i = "job" ]; then
+elif [ $i = "route" ]; then
 
 ITEM=".items[5]"
+
+elif [ $i = "job" ]; then
+
+ITEM=".items[6]"
 
 else
 
 ITEM=""
 
 fi
+
+RCLONE_ACCESS_KEY_ID=$(echo -n $RCLONE_ACCESS_KEY_ID | base64)
+RCLONE_SECRET_ACCESS_KEY=$(echo -n $RCLONE_SECRET_ACCESS_KEY | base64)
 
 oc process -f $f \
 -p BRANCH=$BRANCH \
