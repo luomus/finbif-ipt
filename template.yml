@@ -50,7 +50,7 @@ parameters:
     value: "Forbid"
   - name: LIVENESS_PERIOD
     required: true
-    value: "30"
+    value: "45"
   - name: FAILURE_THRESHOLD
     required: true
     value: "5"
@@ -65,10 +65,6 @@ parameters:
     required: true
   - name: RCLONE_SECRET_ACCESS_KEY
     required: true
-  - name: GITHUB_SECRET
-    required: true
-    generate: expression
-    from: "[a-zA-Z0-9]{20}"
 metadata:
   name: ${APP}
 objects:
@@ -83,38 +79,6 @@ objects:
     resources:
       requests:
         storage: ${STORAGE}
-- kind: ImageStream
-  apiVersion: v1
-  metadata:
-    name: ${APP}-${BRANCH}
-    labels:
-      app: ${APP}
-  spec:
-    lookupPolicy:
-      local: true
-- kind: BuildConfig
-  apiVersion: v1
-  metadata:
-    name: ${APP}-${BRANCH}
-    labels:
-      app: ${APP}
-  spec:
-    output:
-      to:
-        kind: ImageStreamTag
-        name: ${APP}-${BRANCH}:latest
-    source:
-      type: Git
-      git:
-        uri: https://github.com/luomus/${APP}.git
-        ref: ${BRANCH}
-    strategy:
-      type: Docker
-    triggers:
-    - type: ConfigChange
-    - type: GitHub
-      github:
-        secret: ${GITHUB_SECRET}
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
@@ -135,7 +99,7 @@ objects:
           branch: ${BRANCH}
       spec:
         containers:
-        - image: ${APP}-${BRANCH}:latest
+        - image: ghcr.io/luomus/${APP}:${BRANCH}
           name: ${APP}-${BRANCH}
           ports:
           - containerPort: ${{APP_PORT}}
@@ -164,19 +128,11 @@ objects:
             value: ${BRANCH}
           - name: HOST
             value: ${HOST}
-          resources:
-            limits:
-              memory: "6Gi"
-              cpu: "1000m"
-        - image: ${APP}-${BRANCH}:latest
+        - image: ghcr.io/luomus/${APP}:${BRANCH}
           name: ${API}-${BRANCH}
           command: ${{API_CMD}}
           ports:
           - containerPort: ${{API_PORT}}
-          resources:
-            limits:
-              memory: "1Gi"
-              cpu: "500m"
           volumeMounts:
           - mountPath: ${DATA_DIR}
             name: ${APP}-${BRANCH}
@@ -201,17 +157,6 @@ objects:
         - name: ${APP}-${BRANCH}
           persistentVolumeClaim:
             claimName: ${APP}-${BRANCH}
-    triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      imageChangeParams:
-        automatic: true
-        containerNames:
-        - ${APP}-${BRANCH}
-        - ${API}-${BRANCH}
-        from:
-          kind: ImageStreamTag
-          name: ${APP}-${BRANCH}:latest
 - kind: Service
   apiVersion: v1
   metadata:
