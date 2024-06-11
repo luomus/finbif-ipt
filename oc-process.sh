@@ -29,33 +29,25 @@ if [ $i = "volume" ]; then
 
 ITEM=".items[0]"
 
-elif [ $i = "image" ]; then
+elif [ $i = "deploy" ]; then
 
 ITEM=".items[1]"
 
-elif [ $i = "build" ]; then
+elif [ $i = "service-app" ]; then
 
 ITEM=".items[2]"
 
-elif [ $i = "deploy" ]; then
+elif [ $i = "service-api" ]; then
 
 ITEM=".items[3]"
 
-elif [ $i = "service-app" ]; then
+elif [ $i = "route" ]; then
 
 ITEM=".items[4]"
 
-elif [ $i = "service-api" ]; then
-
-ITEM=".items[5]"
-
-elif [ $i = "route" ]; then
-
-ITEM=".items[6]"
-
 elif [ $i = "job" ]; then
 
-ITEM=".items[7]"
+ITEM=".items[5]"
 
 else
 
