@@ -225,8 +225,8 @@ objects:
               app: ${APP}
           spec:
             containers:
-            - name: ${APP}-${BRANCH}-${CRON}
-              image: ${APP}-${BRANCH}:latest
+            - name: ${APP}-${BRANCH}
+              image: ghcr.io/luomus/${APP}:${BRANCH}
               command: ${{CRON_CMD}}
               env:
               - name: RCLONE_CONFIG_DEFAULT_ACCESS_KEY_ID
