@@ -108,6 +108,7 @@ objects:
       spec:
         containers:
         - image: ghcr.io/luomus/${APP}:${BRANCH}
+          imagePullPolicy: Always
           name: ${APP}-${BRANCH}
           ports:
           - containerPort: ${{APP_PORT}}
@@ -137,6 +138,7 @@ objects:
           - name: HOST
             value: ${HOST}
         - image: ghcr.io/luomus/${APP}:${BRANCH}
+          imagePullPolicy: Always
           name: ${API}-${BRANCH}
           command: ${{API_CMD}}
           ports:
