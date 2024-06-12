@@ -53,14 +53,22 @@ elif [ $i = "job" ]; then
 
 ITEM=".items[6]"
 
-else
+elif [ $i = "all" ]; then
 
 ITEM=""
 
+else
+
+echo "Object not found"
+exit 1
+
 fi
+
 
 RCLONE_ACCESS_KEY_ID=$(echo -n $RCLONE_ACCESS_KEY_ID | base64)
 RCLONE_SECRET_ACCESS_KEY=$(echo -n $RCLONE_SECRET_ACCESS_KEY | base64)
+
+oc project finbif-ipt
 
 oc process -f $f \
 -p BRANCH=$BRANCH \
