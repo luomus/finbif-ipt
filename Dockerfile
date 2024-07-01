@@ -1,5 +1,5 @@
 # docker manifest inspect gbif/ipt:latest -v | jq '.Descriptor.digest'
-FROM gbif/ipt:latest@sha256:237fb8e8f016866c0bc66cede7b84959df549844ef4275c0e0a86e1a8dd5f528
+FROM gbif/ipt:latest@sha256:2f1912e24ea1e797556f9f01916d8b972b35a87c79be47a7aaf08207e0379b59
 
 ENV IPT_DATA_DIR=/srv/ipt
 ENV HOME=/home/user
