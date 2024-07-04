@@ -247,4 +247,8 @@ objects:
                 value: ${API_PORT}
               - name: BRANCH
                 value: ${BRANCH}
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 100Mi
             restartPolicy: Never
