@@ -110,6 +110,10 @@ objects:
         - image: ghcr.io/luomus/${APP}:${BRANCH}
           imagePullPolicy: Always
           name: ${APP}-${BRANCH}
+          resources:
+            limits:
+              cpu: 250m
+              memory: 500Mi
           ports:
           - containerPort: ${{APP_PORT}}
           volumeMounts:
@@ -140,6 +144,10 @@ objects:
         - image: ghcr.io/luomus/${APP}:${BRANCH}
           imagePullPolicy: Always
           name: ${API}-${BRANCH}
+          resources:
+            limits:
+              cpu: 250m
+              memory: 500Mi
           command: ${{API_CMD}}
           ports:
           - containerPort: ${{API_PORT}}
