@@ -1,6 +1,8 @@
 # docker manifest inspect gbif/ipt:latest -v | jq '.Descriptor.digest'
 FROM gbif/ipt:latest@sha256:ca127acea9486dad966a5cd97e221c70e9a53e4783c52759174a5baea079cef6
 
+USER root
+
 ENV IPT_DATA_DIR=/srv/ipt
 ENV HOME=/home/user
 ENV DEBIAN_FRONTEND=noninteractive
@@ -25,6 +27,8 @@ RUN mkdir -p /srv/ipt \
  && permissions.sh
 
 WORKDIR /home/user
+
+USER $TOMCAT_USER
 
 ENTRYPOINT ["entrypoint.sh"]
 
