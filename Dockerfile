@@ -1,5 +1,5 @@
 # docker manifest inspect gbif/ipt:latest -v | jq '.Descriptor.digest'
-FROM gbif/ipt:latest@sha256:19069b285965b844919442a4c07ba3979bfe1fd8e4d8b27426c8cfb01a0a18f4 AS builder
+FROM gbif/ipt:latest@sha256:97ef355fe60e75b9a59d55c207162dc0e0748a80fb3bf1aa8604babb2e27d8a5 AS builder
 
 FROM tomcat:11.0.23-jdk17-temurin
 
