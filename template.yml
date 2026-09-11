@@ -121,19 +121,19 @@ objects:
             name: ${APP}-${BRANCH}
           startupProbe:
             httpGet:
-              path: /about.do
+              path: /health.do
               port: ${{APP_PORT}}
             failureThreshold: ${{FAILURE_THRESHOLD}}
             periodSeconds: ${{LIVENESS_PERIOD}}
           livenessProbe:
             httpGet:
-              path: /about.do
+              path: /health.do
               port: ${{APP_PORT}}
             failureThreshold: ${{FAILURE_THRESHOLD}}
             periodSeconds: ${{LIVENESS_PERIOD}}
           readinessProbe:
             httpGet:
-              path: /
+              path: /health.do
               port: ${{APP_PORT}}
             periodSeconds: ${{READINESS_PERIOD}}
           env:
